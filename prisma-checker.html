@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISMA 2020 Compliance Checker</title>
+  <meta name="description" content="PRISMA 2020 Checklist Compliance Checker — assess systematic review reporting against the 27-item PRISMA 2020 statement.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS Variables ===== */
+    :root {
+      --color-primary-50: #ecfdf5;
+      --color-primary-100: #d1fae5;
+      --color-primary-200: #a7f3d0;
+      --color-primary-300: #6ee7b7;
+      --color-primary-400: #34d399;
+      --color-primary-500: #10b981;
+      --color-primary-600: #059669;
+      --color-primary-700: #047857;
+      --color-primary-800: #065f46;
+      --color-primary-900: #064e3b;
+
+      --color-accent-50: #f0fdfa;
+      --color-accent-100: #ccfbf1;
+      --color-accent-200: #99f6e4;
+      --color-accent-300: #5eead4;
+      --color-accent-400: #2dd4bf;
+      --color-accent-500: #14b8a6;
+      --color-accent-600: #0d9488;
+      --color-accent-700: #0f766e;
+      --color-accent-800: #115e59;
+      --color-accent-900: #134e4a;
+
+      --surface-bg: #0f172a;
+      --surface-raised: #1e293b;
+      --surface-overlay: #334155;
+      --surface-border: #475569;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --status-reported: #10b981;
+      --status-partial: #f59e0b;
+      --status-not-reported: #ef4444;
+      --status-na: #6b7280;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.3);
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="light"] {
+      --surface-bg: #f8fafc;
+      --surface-raised: #ffffff;
+      --surface-overlay: #f1f5f9;
+      --surface-border: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--surface-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ===== Scrollbar ===== */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--surface-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface-overlay); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-500); }
+
+    /* ===== Header / Hero ===== */
+    .hero {
+      background: linear-gradient(135deg, var(--color-primary-900), var(--color-accent-800));
+      padding: var(--space-8) var(--space-6);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 50%, rgba(16,185,129,0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 70% 50%, rgba(20,184,166,0.1) 0%, transparent 60%);
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: var(--space-2);
+      letter-spacing: -0.02em;
+    }
+    .hero p {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      padding: var(--space-1) var(--space-4);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-3);
+      backdrop-filter: blur(4px);
+    }
+    .hero-meta {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-6);
+      margin-top: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .hero-meta-item {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+    }
+    .hero-meta-item strong {
+      color: var(--color-primary-300);
+    }
+    .theme-toggle-wrap {
+      position: absolute;
+      top: var(--space-4);
+      right: var(--space-4);
+      z-index: 2;
+    }
+
+    /* ===== Theme Toggle ===== */
+    .theme-toggle {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: background var(--transition);
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.25); }
+    .theme-toggle:focus-visible { outline: 2px solid var(--color-accent-400); outline-offset: 2px; }
+
+    /* ===== Tab Navigation ===== */
+    .tab-nav {
+      display: flex;
+      background: var(--surface-raised);
+      border-bottom: 1px solid var(--surface-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: var(--space-4) var(--space-5);
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: color var(--transition), background var(--transition);
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--text-primary); background: var(--surface-overlay); }
+    .tab-btn[aria-selected="true"] {
+      color: var(--color-primary-500);
+    }
+    .tab-btn[aria-selected="true"]::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--color-primary-500);
+      border-radius: 3px 3px 0 0;
+    }
+    .tab-btn:focus-visible { outline: 2px solid var(--color-accent-400); outline-offset: -2px; }
+    .tab-btn .tab-icon { margin-right: var(--space-2); }
+
+    /* ===== Tab Panels ===== */
+    .tab-panel { display: none; padding: var(--space-6); max-width: 1200px; margin: 0 auto; }
+    .tab-panel.active { display: block; }
+
+    /* ===== Section Headers ===== */
+    .section-header {
+      background: linear-gradient(135deg, var(--color-primary-800), var(--color-accent-700));
+      color: #fff;
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+      margin-top: var(--space-6);
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-header:first-child { margin-top: 0; }
+    .section-progress {
+      font-size: 0.8rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    /* ===== Checklist Item Card ===== */
+    .checklist-item {
+      background: var(--surface-raised);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-3);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      border-left: 4px solid var(--surface-border);
+    }
+    .checklist-item:hover { box-shadow: var(--shadow-md); }
+    .checklist-item[data-status="reported"] { border-left-color: var(--status-reported); }
+    .checklist-item[data-status="partial"] { border-left-color: var(--status-partial); }
+    .checklist-item[data-status="not-reported"] { border-left-color: var(--status-not-reported); }
+    .checklist-item[data-status="na"] { border-left-color: var(--status-na); }
+
+    .item-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .item-number {
+      background: var(--surface-overlay);
+      color: var(--text-primary);
+      min-width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .checklist-item[data-status="reported"] .item-number { background: var(--status-reported); color: #fff; }
+    .checklist-item[data-status="partial"] .item-number { background: var(--status-partial); color: #fff; }
+    .checklist-item[data-status="not-reported"] .item-number { background: var(--status-not-reported); color: #fff; }
+    .checklist-item[data-status="na"] .item-number { background: var(--status-na); color: #fff; }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .item-description {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ===== Radio Group ===== */
+    .status-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: var(--space-3) 0;
+    }
+    .status-radio {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .status-label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--surface-border);
+      background: var(--surface-bg);
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+    .status-label:hover { border-color: var(--text-muted); }
+    .status-radio:focus-visible + .status-label {
+      outline: 2px solid var(--color-accent-400);
+      outline-offset: 2px;
+    }
+    .status-radio:checked + .status-label.label-reported {
+      background: rgba(16,185,129,0.15);
+      border-color: var(--status-reported);
+      color: var(--status-reported);
+    }
+    .status-radio:checked + .status-label.label-partial {
+      background: rgba(245,158,11,0.15);
+      border-color: var(--status-partial);
+      color: var(--status-partial);
+    }
+    .status-radio:checked + .status-label.label-not-reported {
+      background: rgba(239,68,68,0.15);
+      border-color: var(--status-not-reported);
+      color: var(--status-not-reported);
+    }
+    .status-radio:checked + .status-label.label-na {
+      background: rgba(107,114,128,0.15);
+      border-color: var(--status-na);
+      color: var(--status-na);
+    }
+
+    /* ===== Inputs ===== */
+    .item-fields {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+    @media (max-width: 640px) {
+      .item-fields { grid-template-columns: 1fr; }
+    }
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: var(--space-1);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .field-input, .field-textarea {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      transition: border-color var(--transition);
+    }
+    .field-input:focus, .field-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+    }
+    .field-textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    /* ===== Dashboard ===== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+    .dash-card {
+      background: var(--surface-raised);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+    }
+    .dash-card-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-3);
+    }
+    .score-ring {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto var(--space-4);
+      position: relative;
+    }
+    .score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .score-ring-bg { fill: none; stroke: var(--surface-overlay); stroke-width: 10; }
+    .score-ring-fg {
+      fill: none;
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.8s ease, stroke 0.3s ease;
+    }
+    .score-ring-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .score-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .score-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: var(--space-1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { font-size: 0.88rem; color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-2); }
+    .stat-value { font-weight: 700; font-size: 1rem; }
+    .stat-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Section bars */
+    .section-bar-wrap { margin-bottom: var(--space-4); }
+    .section-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: var(--space-1);
+    }
+    .section-bar-label span:first-child { font-weight: 600; color: var(--text-primary); }
+    .section-bar-label span:last-child { color: var(--text-secondary); }
+    .section-bar-track {
+      width: 100%;
+      height: 12px;
+      background: var(--surface-overlay);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .section-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.6s ease;
+      background: linear-gradient(90deg, var(--color-primary-500), var(--color-accent-500));
+    }
+
+    /* Attention list */
+    .attention-list { list-style: none; }
+    .attention-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-2);
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      font-size: 0.88rem;
+    }
+    .attention-badge {
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .attention-badge.partial { background: rgba(245,158,11,0.15); color: var(--status-partial); }
+    .attention-badge.not-reported { background: rgba(239,68,68,0.15); color: var(--status-not-reported); }
+
+    /* Compliance statement */
+    .compliance-statement {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin-top: var(--space-4);
+      white-space: pre-wrap;
+    }
+
+    /* ===== Extensions Tab ===== */
+    .extension-card {
+      background: var(--surface-raised);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+    .extension-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .extension-check {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--color-primary-500);
+      cursor: pointer;
+    }
+    .extension-title { font-weight: 700; font-size: 1rem; }
+    .extension-desc {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      margin-top: var(--space-2);
+      margin-left: 32px;
+    }
+    .extension-items {
+      margin-top: var(--space-4);
+      margin-left: 32px;
+      display: none;
+    }
+    .extension-card.active .extension-items { display: block; }
+    .ext-item {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .ext-item-check {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--color-primary-500);
+      cursor: pointer;
+    }
+    .ext-item-label { font-size: 0.88rem; color: var(--text-primary); }
+
+    /* ===== Export Tab ===== */
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    .export-card {
+      background: var(--surface-raised);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .export-card:hover {
+      border-color: var(--color-primary-500);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+    .export-card:focus-visible { outline: 2px solid var(--color-accent-400); outline-offset: 2px; }
+    .export-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-3);
+    }
+    .export-card-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: var(--space-2);
+    }
+    .export-card-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .export-preview {
+      background: var(--surface-raised);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+    }
+    .export-preview-title {
+      font-weight: 700;
+      margin-bottom: var(--space-3);
+    }
+    .export-preview-content {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-secondary);
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn:focus-visible { outline: 2px solid var(--color-accent-400); outline-offset: 2px; }
+    .btn-primary {
+      background: var(--color-primary-600);
+      color: #fff;
+      border-color: var(--color-primary-600);
+    }
+    .btn-primary:hover { background: var(--color-primary-700); }
+    .btn-secondary {
+      background: var(--surface-overlay);
+      color: var(--text-primary);
+      border-color: var(--surface-border);
+    }
+    .btn-secondary:hover { background: var(--surface-border); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border-color: transparent;
+    }
+    .btn-ghost:hover { color: var(--text-primary); background: var(--surface-overlay); }
+
+    /* ===== Toast ===== */
+    .toast-container {
+      position: fixed;
+      bottom: var(--space-6);
+      right: var(--space-6);
+      z-index: 9999;
+    }
+    .toast {
+      background: var(--color-primary-600);
+      color: #fff;
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      margin-top: var(--space-2);
+      animation: toastIn 0.3s ease;
+    }
+    .toast.error { background: var(--status-not-reported); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Reset Button ===== */
+    .reset-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    /* ===== Footer ===== */
+    .app-footer {
+      text-align: center;
+      padding: var(--space-6);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--surface-border);
+      margin-top: var(--space-8);
+    }
+    .app-footer a {
+      color: var(--color-primary-500);
+      text-decoration: none;
+    }
+    .app-footer a:hover { text-decoration: underline; }
+
+    /* ===== Print ===== */
+    @media print {
+      .hero, .tab-nav, .theme-toggle-wrap, .reset-bar, .export-grid, .toast-container { display: none !important; }
+      .tab-panel { display: block !important; padding: 0; max-width: 100%; }
+      #panel-checklist { page-break-after: always; }
+      #panel-dashboard, #panel-extensions { display: none !important; }
+      .checklist-item { break-inside: avoid; border: 1px solid #ccc; margin-bottom: 8px; }
+      body { background: #fff; color: #000; }
+      .section-header { background: #059669 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.5rem; }
+      .tab-btn { padding: var(--space-3); font-size: 0.82rem; min-width: 90px; }
+      .tab-panel { padding: var(--space-4); }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .export-grid { grid-template-columns: 1fr; }
+      .item-fields { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero -->
+  <header class="hero">
+    <div class="theme-toggle-wrap">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+        <span id="themeIcon">&#9788;</span>
+      </button>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">PRISMA 2020</div>
+      <h1>PRISMA 2020 Compliance Checker</h1>
+      <p>Assess your systematic review manuscript against the 27-item PRISMA 2020 statement (Page et al. BMJ 2021;372:n71)</p>
+      <div class="hero-meta">
+        <span class="hero-meta-item"><strong>27</strong> checklist items</span>
+        <span class="hero-meta-item"><strong>7</strong> sections</span>
+        <span class="hero-meta-item"><strong>6</strong> extensions</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav" role="tablist" aria-label="Main navigation">
+    <button class="tab-btn" role="tab" id="tab-checklist" aria-selected="true" aria-controls="panel-checklist" tabindex="0">
+      <span class="tab-icon">&#9745;</span> Checklist
+    </button>
+    <button class="tab-btn" role="tab" id="tab-dashboard" aria-selected="false" aria-controls="panel-dashboard" tabindex="-1">
+      <span class="tab-icon">&#9635;</span> Dashboard
+    </button>
+    <button class="tab-btn" role="tab" id="tab-extensions" aria-selected="false" aria-controls="panel-extensions" tabindex="-1">
+      <span class="tab-icon">&#9881;</span> Extensions
+    </button>
+    <button class="tab-btn" role="tab" id="tab-export" aria-selected="false" aria-controls="panel-export" tabindex="-1">
+      <span class="tab-icon">&#8681;</span> Export
+    </button>
+  </nav>
+
+  <!-- Tab Panels -->
+  <main>
+    <!-- Checklist Panel -->
+    <div class="tab-panel active" role="tabpanel" id="panel-checklist" aria-labelledby="tab-checklist">
+      <div class="reset-bar">
+        <button class="btn btn-ghost" id="btnExpandAll" type="button">Expand All</button>
+        <button class="btn btn-secondary" id="btnResetAll" type="button">Reset All</button>
+      </div>
+      <div id="checklistContainer"></div>
+    </div>
+
+    <!-- Dashboard Panel -->
+    <div class="tab-panel" role="tabpanel" id="panel-dashboard" aria-labelledby="tab-dashboard">
+      <div id="dashboardContainer"></div>
+    </div>
+
+    <!-- Extensions Panel -->
+    <div class="tab-panel" role="tabpanel" id="panel-extensions" aria-labelledby="tab-extensions">
+      <div id="extensionsContainer"></div>
+    </div>
+
+    <!-- Export Panel -->
+    <div class="tab-panel" role="tabpanel" id="panel-export" aria-labelledby="tab-export">
+      <div id="exportContainer"></div>
+    </div>
+  </main>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>PRISMA 2020 Compliance Checker &mdash; Based on Page MJ, McKenzie JE, Bossuyt PM, et al. The PRISMA 2020 statement. BMJ 2021;372:n71.</p>
+    <p>This tool assists in self-assessment and does not constitute formal compliance certification.</p>
+  </footer>
+
+  <script>
+  /* ===== PRISMA Checker IIFE ===== */
+  (function() {
+    'use strict';
+
+    /* ---------- Utility ---------- */
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function sanitizeCSV(val) {
+      var s = String(val == null ? '' : val);
+      if (/^[=+@\t\r]/.test(s)) {
+        s = "'" + s;
+      }
+      return s;
+    }
+
+    function showToast(msg, isError) {
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(function() { toast.remove(); }, 3000);
+    }
+
+    /* ---------- PRISMA 2020 Data ---------- */
+    var SECTIONS = [
+      { id: 'title', name: 'Title', items: [1] },
+      { id: 'abstract', name: 'Abstract', items: [2] },
+      { id: 'introduction', name: 'Introduction', items: [3, 4] },
+      { id: 'methods', name: 'Methods', items: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+      { id: 'results', name: 'Results', items: [17, 18, 19, 20, 21, 22, 23] },
+      { id: 'discussion', name: 'Discussion', items: [24, 25, 26] },
+      { id: 'other', name: 'Other Information', items: [27] }
+    ];
+
+    var CHECKLIST_ITEMS = [
+      {
+        num: 1,
+        title: 'Title',
+        description: 'Identify the report as a systematic review.'
+      },
+      {
+        num: 2,
+        title: 'Abstract',
+        description: 'Provide a structured summary including, as applicable: background; objectives; data sources; study eligibility criteria, participants, and interventions; study appraisal and synthesis methods; results; limitations; conclusions and implications of key findings; systematic review registration number.'
+      },
+      {
+        num: 3,
+        title: 'Rationale',
+        description: 'Describe the rationale for the review in the context of existing knowledge.'
+      },
+      {
+        num: 4,
+        title: 'Objectives',
+        description: 'Provide an explicit statement of the objective(s) or question(s) the review addresses using PICO or similar components.'
+      },
+      {
+        num: 5,
+        title: 'Eligibility criteria',
+        description: 'Specify the inclusion and exclusion criteria for the review and how studies were grouped for the syntheses.'
+      },
+      {
+        num: 6,
+        title: 'Information sources',
+        description: 'Specify all databases, registers, websites, organisations, reference lists, and other sources searched or consulted to identify studies. Specify the date when each source was last searched or consulted.'
+      },
+      {
+        num: 7,
+        title: 'Search strategy',
+        description: 'Present the full search strategies for all databases, registers, and websites, including any filters and limits used.'
+      },
+      {
+        num: 8,
+        title: 'Selection process',
+        description: 'Specify the methods used to decide whether a study met the inclusion criteria of the review, including how many reviewers screened each record and each report retrieved, whether they worked independently, and if applicable, details of automation tools used in the process.'
+      },
+      {
+        num: 9,
+        title: 'Data collection process',
+        description: 'Specify the methods used to collect data from reports, including how many reviewers collected data from each report, whether they worked independently, any processes for obtaining or confirming data from study investigators, and if applicable, details of automation tools used in the process.'
+      },
+      {
+        num: 10,
+        title: 'Data items',
+        description: 'List and define all outcomes for which data were sought. List and define all other variables for which data were sought (e.g., participant and intervention characteristics, funding sources). Describe any assumptions made about any missing or unclear information.'
+      },
+      {
+        num: 11,
+        title: 'Study risk of bias assessment',
+        description: 'Specify the methods used to assess risk of bias in the included studies, including details of the tool(s) used, how many reviewers assessed each study and whether they worked independently, and if applicable, details of automation tools used in the process.'
+      },
+      {
+        num: 12,
+        title: 'Effect measures',
+        description: 'Specify for each outcome the effect measure(s) (e.g., risk ratio, mean difference) used in the synthesis or presentation of results.'
+      },
+      {
+        num: 13,
+        title: 'Synthesis methods',
+        description: 'Describe the processes used to decide which studies were eligible for each synthesis (e.g., tabulating the study intervention characteristics and comparing against the planned groups for each synthesis). Describe any methods required to prepare the data for presentation or synthesis, such as handling of missing summary statistics, or data conversions. Describe any methods used to tabulate or visually display results of individual studies and syntheses. Describe any methods used to synthesize results and provide a rationale for the choice(s). If meta-analysis was performed, describe the model(s), method(s) to identify the presence and extent of statistical heterogeneity, and software package(s) used. Describe any methods used to explore possible causes of heterogeneity among study results (e.g., subgroup analysis, meta-regression). Describe any sensitivity analyses conducted to assess robustness of the synthesized results.'
+      },
+      {
+        num: 14,
+        title: 'Reporting bias assessment',
+        description: 'Describe any methods used to assess risk of bias due to missing results in a synthesis (arising from reporting biases).'
+      },
+      {
+        num: 15,
+        title: 'Certainty assessment',
+        description: 'Describe any methods used to assess certainty (or confidence) in the body of evidence for an outcome.'
+      },
+      {
+        num: 16,
+        title: 'Protocol and registration',
+        description: 'Indicate whether a review protocol exists and where it can be accessed (e.g., Web address); and, if available, provide registration information including the registration number.'
+      },
+      {
+        num: 17,
+        title: 'Study selection',
+        description: 'Describe the results of the search and selection process, from the number of records identified in the search to the number of studies included in the review, ideally using a flow diagram (see PRISMA 2020 flow diagram template).'
+      },
+      {
+        num: 18,
+        title: 'Study characteristics',
+        description: 'Cite each included study and present its characteristics.'
+      },
+      {
+        num: 19,
+        title: 'Risk of bias in studies',
+        description: 'Present assessments of risk of bias for each included study.'
+      },
+      {
+        num: 20,
+        title: 'Results of individual studies',
+        description: 'For all outcomes, present, for each study: (a) summary statistics for each group (where appropriate) and (b) an effect estimate and its precision (e.g., confidence/credible interval), ideally using structured tables or forest plots.'
+      },
+      {
+        num: 21,
+        title: 'Results of syntheses',
+        description: 'For each synthesis, briefly summarise the characteristics and risk of bias among contributing studies. Present results of all statistical syntheses conducted. If meta-analysis was done, present for each the summary estimate and its precision (e.g., confidence/credible interval) and measures of statistical heterogeneity. If comparing groups, describe the direction of the effect. Present results of all investigations of possible causes of heterogeneity among study results. Present results of all sensitivity analyses conducted to assess the robustness of the synthesized results.'
+      },
+      {
+        num: 22,
+        title: 'Reporting biases',
+        description: 'Present assessments of risk of bias due to missing results (arising from reporting biases) for each synthesis assessed.'
+      },
+      {
+        num: 23,
+        title: 'Certainty of evidence',
+        description: 'Present assessments of certainty (or confidence) in the body of evidence for each outcome assessed.'
+      },
+      {
+        num: 24,
+        title: 'Discussion',
+        description: 'Provide a general interpretation of the results in the context of other evidence. Discuss limitations of the evidence included in the review. Discuss limitations of the review processes used. Discuss implications of the results for practice, policy, and future research.'
+      },
+      {
+        num: 25,
+        title: 'Limitations',
+        description: 'Discuss any limitations of the review processes used (e.g., limited evidence, potential for bias).'
+      },
+      {
+        num: 26,
+        title: 'Conclusions',
+        description: 'Provide a general interpretation and implications of the results in the context of other evidence, and implications for future research.'
+      },
+      {
+        num: 27,
+        title: 'Registration and protocol',
+        description: 'Provide registration information for the review, including register name and registration number, or state that the review was not registered. Indicate where the review protocol can be accessed, or state that a protocol was not prepared. Describe and explain any amendments to information provided at registration or in the protocol. Specify sources of financial or other support for the review, and the role of the funders or sponsors in the review. Declare any competing interests of review authors.'
+      }
+    ];
+
+    /* ---------- Extensions Data ---------- */
+    var EXTENSIONS = [
+      {
+        id: 'prisma-s',
+        name: 'PRISMA-S',
+        fullName: 'PRISMA for Searching',
+        description: 'Extension for reporting literature searches in systematic reviews.',
+        items: [
+          { id: 'ps1', label: 'Database name: Name each database searched, stating the platform/provider for each' },
+          { id: 'ps2', label: 'Multi-database searching: If databases were searched simultaneously, state the name of the platform' },
+          { id: 'ps3', label: 'Study registries: List any study registries searched' },
+          { id: 'ps4', label: 'Online resources and browsing: Describe any online or print source purposefully searched/browsed' },
+          { id: 'ps5', label: 'Citation searching: Indicate whether cited references or citing references were examined' },
+          { id: 'ps6', label: 'Contacts: Indicate whether additional studies/data were sought by contacting authors, experts, etc.' },
+          { id: 'ps7', label: 'Search strategies: Include the complete search strategies for each database/source' },
+          { id: 'ps8', label: 'Limits and restrictions: Specify that no date/language/publication status limits were used, or describe any' },
+          { id: 'ps9', label: 'Search filter: State whether published search filters were used, and cite the source' },
+          { id: 'ps10', label: 'Prior work: Indicate when search strategies from prior reviews were adapted' },
+          { id: 'ps11', label: 'Updates and amendments: Report when additional searches were run and changes to original strategy' },
+          { id: 'ps12', label: 'Dates of searches: For each search strategy, provide the date the search was conducted' },
+          { id: 'ps13', label: 'Peer review: Describe any search peer-review process (e.g., PRESS)' },
+          { id: 'ps14', label: 'Total records: Document the total number of records identified from each database and source' },
+          { id: 'ps15', label: 'Deduplication: Describe the processes/software used to deduplicate records' },
+          { id: 'ps16', label: 'Search management: Describe the process for managing records throughout the review' }
+        ]
+      },
+      {
+        id: 'prisma-scr',
+        name: 'PRISMA-ScR',
+        fullName: 'PRISMA for Scoping Reviews',
+        description: 'Extension for scoping reviews — mapping evidence, identifying key concepts, and gaps.',
+        items: [
+          { id: 'scr1', label: 'Indicate that the report is a scoping review in the title' },
+          { id: 'scr2', label: 'Provide rationale for the scoping review approach; describe the objective(s) and question(s)' },
+          { id: 'scr3', label: 'Describe inclusion/exclusion criteria and concept definitions used' },
+          { id: 'scr4', label: 'Use a flow diagram to report study selection (PRISMA-ScR flow diagram)' },
+          { id: 'scr5', label: 'Provide a charting table or summary of characteristics for each source' },
+          { id: 'scr6', label: 'Summarize main findings; map to review question(s) and objective(s)' }
+        ]
+      },
+      {
+        id: 'prisma-nma',
+        name: 'PRISMA-NMA',
+        fullName: 'PRISMA for Network Meta-Analyses',
+        description: 'Extension for reporting systematic reviews with network meta-analysis of health interventions.',
+        items: [
+          { id: 'nma1', label: 'Describe the geometry of the treatment network (network diagram)' },
+          { id: 'nma2', label: 'Describe methods for evaluating the transitivity assumption' },
+          { id: 'nma3', label: 'Describe the statistical methods for NMA (model, priors if Bayesian, software)' },
+          { id: 'nma4', label: 'Describe methods for assessing statistical inconsistency' },
+          { id: 'nma5', label: 'Present treatment rankings (e.g., SUCRA, P-scores, mean ranks) with uncertainty' },
+          { id: 'nma6', label: 'Present all pairwise effect estimates with confidence/credible intervals' },
+          { id: 'nma7', label: 'Describe results of inconsistency assessments' },
+          { id: 'nma8', label: 'Present results of all sensitivity analyses and subgroup analyses for the NMA' }
+        ]
+      },
+      {
+        id: 'prisma-dta',
+        name: 'PRISMA-DTA',
+        fullName: 'PRISMA for Diagnostic Test Accuracy',
+        description: 'Extension for systematic reviews of diagnostic test accuracy studies.',
+        items: [
+          { id: 'dta1', label: 'State the index test(s) and reference standard(s) and their intended roles' },
+          { id: 'dta2', label: 'Describe any prior test(s) or clinical information used to guide index test interpretation' },
+          { id: 'dta3', label: 'Report the threshold(s) used to define positive/negative test results' },
+          { id: 'dta4', label: 'Report estimates of diagnostic accuracy and their precision (e.g., 95% CI)' },
+          { id: 'dta5', label: 'Present cross-tabulations of index test results by reference standard (2x2 tables)' },
+          { id: 'dta6', label: 'Describe any analysis of variation in diagnostic accuracy related to patient/study features' },
+          { id: 'dta7', label: 'Report QUADAS-2 or QUADAS-C risk of bias and applicability assessments' }
+        ]
+      },
+      {
+        id: 'prisma-ipd',
+        name: 'PRISMA-IPD',
+        fullName: 'PRISMA for Individual Patient Data',
+        description: 'Extension for systematic reviews and meta-analyses of individual participant data.',
+        items: [
+          { id: 'ipd1', label: 'Describe the methods used to obtain individual participant data (IPD)' },
+          { id: 'ipd2', label: 'Report the proportion of eligible studies for which IPD were obtained and reasons for non-availability' },
+          { id: 'ipd3', label: 'Describe data integrity checks performed on the IPD' },
+          { id: 'ipd4', label: 'Describe the IPD analysis methods (one-stage vs. two-stage)' },
+          { id: 'ipd5', label: 'Report any differences between IPD provided and study reports' },
+          { id: 'ipd6', label: 'Report results from IPD analyses alongside any aggregate data analyses' },
+          { id: 'ipd7', label: 'Report participant-level subgroup and interaction analyses' }
+        ]
+      },
+      {
+        id: 'prisma-p',
+        name: 'PRISMA-P',
+        fullName: 'PRISMA for Protocols',
+        description: 'Extension for systematic review and meta-analysis protocols.',
+        items: [
+          { id: 'pp1', label: 'Indicate it is a protocol and identify planned type of systematic review' },
+          { id: 'pp2', label: 'If registered, provide registry name, registration number, and URL' },
+          { id: 'pp3', label: 'Indicate planned start and anticipated completion dates' },
+          { id: 'pp4', label: 'Describe planned data management and integrity verification processes' },
+          { id: 'pp5', label: 'Specify planned outcomes and prioritisation (primary vs. secondary)' },
+          { id: 'pp6', label: 'Describe planned risk of bias assessment (tool, process, blinding)' },
+          { id: 'pp7', label: 'Describe planned data synthesis methods and planned sensitivity/subgroup analyses' },
+          { id: 'pp8', label: 'List any amendments to an earlier protocol version, with dates and rationale' }
+        ]
+      }
+    ];
+
+    /* ---------- Storage ---------- */
+    var STORAGE_KEY = 'prismachecker-data';
+
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveState() {
+      try {
+        var state = {
+          version: 1,
+          items: {},
+          extensions: {},
+          extensionItems: {},
+          theme: document.documentElement.getAttribute('data-theme')
+        };
+        CHECKLIST_ITEMS.forEach(function(item) {
+          var statusEl = document.querySelector('input[name="status-' + item.num + '"]:checked');
+          var pageEl = document.getElementById('page-' + item.num);
+          var notesEl = document.getElementById('notes-' + item.num);
+          state.items[item.num] = {
+            status: statusEl ? statusEl.value : '',
+            page: pageEl ? pageEl.value : '',
+            notes: notesEl ? notesEl.value : ''
+          };
+        });
+        EXTENSIONS.forEach(function(ext) {
+          var cb = document.getElementById('ext-' + ext.id);
+          state.extensions[ext.id] = cb ? cb.checked : false;
+          ext.items.forEach(function(ei) {
+            var ecb = document.getElementById('extitem-' + ei.id);
+            state.extensionItems[ei.id] = ecb ? ecb.checked : false;
+          });
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // storage full or blocked
+      }
+    }
+
+    function restoreState(state) {
+      if (!state || !state.items) return;
+      if (state.theme) {
+        document.documentElement.setAttribute('data-theme', state.theme);
+        updateThemeIcon();
+      }
+      CHECKLIST_ITEMS.forEach(function(item) {
+        var saved = state.items[item.num];
+        if (!saved) return;
+        if (saved.status) {
+          var radio = document.querySelector('input[name="status-' + item.num + '"][value="' + saved.status + '"]');
+          if (radio) {
+            radio.checked = true;
+            updateItemStatus(item.num);
+          }
+        }
+        if (saved.page) {
+          var pageEl = document.getElementById('page-' + item.num);
+          if (pageEl) pageEl.value = saved.page;
+        }
+        if (saved.notes) {
+          var notesEl = document.getElementById('notes-' + item.num);
+          if (notesEl) notesEl.value = saved.notes;
+        }
+      });
+      if (state.extensions) {
+        EXTENSIONS.forEach(function(ext) {
+          var cb = document.getElementById('ext-' + ext.id);
+          if (cb && state.extensions[ext.id]) {
+            cb.checked = true;
+            toggleExtension(ext.id);
+          }
+        });
+      }
+      if (state.extensionItems) {
+        EXTENSIONS.forEach(function(ext) {
+          ext.items.forEach(function(ei) {
+            var ecb = document.getElementById('extitem-' + ei.id);
+            if (ecb && state.extensionItems[ei.id]) {
+              ecb.checked = true;
+            }
+          });
+        });
+      }
+    }
+
+    /* ---------- Tab Navigation ---------- */
+    var tabBtns = document.querySelectorAll('.tab-btn');
+    var tabPanels = document.querySelectorAll('.tab-panel');
+
+    function switchTab(tabId) {
+      tabBtns.forEach(function(btn) {
+        var isSelected = btn.id === 'tab-' + tabId;
+        btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        btn.tabIndex = isSelected ? 0 : -1;
+      });
+      tabPanels.forEach(function(panel) {
+        panel.classList.toggle('active', panel.id === 'panel-' + tabId);
+      });
+      if (tabId === 'dashboard') {
+        renderDashboard();
+      }
+      if (tabId === 'export') {
+        renderExportPreview();
+      }
+    }
+
+    tabBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        switchTab(btn.id.replace('tab-', ''));
+      });
+      btn.addEventListener('keydown', function(e) {
+        var tabs = Array.from(tabBtns);
+        var idx = tabs.indexOf(btn);
+        var newIdx = -1;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          newIdx = (idx + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          newIdx = (idx - 1 + tabs.length) % tabs.length;
+        } else if (e.key === 'Home') {
+          newIdx = 0;
+        } else if (e.key === 'End') {
+          newIdx = tabs.length - 1;
+        }
+        if (newIdx >= 0) {
+          e.preventDefault();
+          tabs[newIdx].focus();
+          switchTab(tabs[newIdx].id.replace('tab-', ''));
+        }
+      });
+    });
+
+    /* ---------- Theme Toggle ---------- */
+    var themeToggle = document.getElementById('themeToggle');
+    function updateThemeIcon() {
+      var icon = document.getElementById('themeIcon');
+      icon.innerHTML = document.documentElement.getAttribute('data-theme') === 'dark' ? '&#9788;' : '&#9790;';
+    }
+    themeToggle.addEventListener('click', function() {
+      var current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+      updateThemeIcon();
+      saveState();
+    });
+
+    /* ---------- Render Checklist ---------- */
+    function renderChecklist() {
+      var container = document.getElementById('checklistContainer');
+      var html = '';
+      SECTIONS.forEach(function(section) {
+        html += '<div class="section-header" id="section-' + escapeHtml(section.id) + '">' +
+          '<span>' + escapeHtml(section.name) + '</span>' +
+          '<span class="section-progress" id="progress-' + escapeHtml(section.id) + '"></span>' +
+          '</div>';
+        section.items.forEach(function(itemNum) {
+          var item = CHECKLIST_ITEMS[itemNum - 1];
+          html += '<div class="checklist-item" id="item-card-' + item.num + '" data-status="">' +
+            '<div class="item-header">' +
+              '<div class="item-number">' + item.num + '</div>' +
+              '<div>' +
+                '<div class="item-title">' + escapeHtml(item.title) + '</div>' +
+                '<div class="item-description">' + escapeHtml(item.description) + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="status-group" role="radiogroup" aria-label="Status for item ' + item.num + '">' +
+              renderRadio(item.num, 'reported', 'Reported') +
+              renderRadio(item.num, 'partial', 'Partially') +
+              renderRadio(item.num, 'not-reported', 'Not reported') +
+              renderRadio(item.num, 'na', 'N/A') +
+            '</div>' +
+            '<div class="item-fields">' +
+              '<div>' +
+                '<label class="field-label" for="page-' + item.num + '">Page / Section</label>' +
+                '<input type="text" class="field-input" id="page-' + item.num + '" placeholder="e.g., p.3, Methods" autocomplete="off">' +
+              '</div>' +
+              '<div>' +
+                '<label class="field-label" for="notes-' + item.num + '">Notes</label>' +
+                '<textarea class="field-textarea" id="notes-' + item.num + '" placeholder="Optional notes..." rows="2"></textarea>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+      });
+      container.innerHTML = html;
+
+      // Bind events
+      container.addEventListener('change', function(e) {
+        if (e.target.classList.contains('status-radio')) {
+          var name = e.target.name;
+          var num = parseInt(name.replace('status-', ''), 10);
+          updateItemStatus(num);
+          updateSectionProgress();
+          saveState();
+        }
+        if (e.target.classList.contains('field-input') || e.target.classList.contains('field-textarea')) {
+          saveState();
+        }
+      });
+      container.addEventListener('input', function(e) {
+        if (e.target.classList.contains('field-input') || e.target.classList.contains('field-textarea')) {
+          saveState();
+        }
+      });
+
+      updateSectionProgress();
+    }
+
+    function renderRadio(num, value, label) {
+      return '<input type="radio" class="status-radio" name="status-' + num + '" ' +
+        'id="status-' + num + '-' + value + '" value="' + value + '">' +
+        '<label class="status-label label-' + value + '" for="status-' + num + '-' + value + '">' +
+        escapeHtml(label) + '</label>';
+    }
+
+    function updateItemStatus(num) {
+      var card = document.getElementById('item-card-' + num);
+      var checked = document.querySelector('input[name="status-' + num + '"]:checked');
+      card.setAttribute('data-status', checked ? checked.value : '');
+    }
+
+    function updateSectionProgress() {
+      SECTIONS.forEach(function(section) {
+        var total = section.items.length;
+        var filled = 0;
+        section.items.forEach(function(num) {
+          var checked = document.querySelector('input[name="status-' + num + '"]:checked');
+          if (checked) filled++;
+        });
+        var el = document.getElementById('progress-' + section.id);
+        if (el) {
+          el.textContent = filled + '/' + total + ' assessed';
+        }
+      });
+    }
+
+    /* ---------- Reset All ---------- */
+    document.getElementById('btnResetAll').addEventListener('click', function() {
+      if (!confirm('Reset all checklist items? This cannot be undone.')) return;
+      CHECKLIST_ITEMS.forEach(function(item) {
+        var radios = document.querySelectorAll('input[name="status-' + item.num + '"]');
+        radios.forEach(function(r) { r.checked = false; });
+        var card = document.getElementById('item-card-' + item.num);
+        if (card) card.setAttribute('data-status', '');
+        var pageEl = document.getElementById('page-' + item.num);
+        if (pageEl) pageEl.value = '';
+        var notesEl = document.getElementById('notes-' + item.num);
+        if (notesEl) notesEl.value = '';
+      });
+      EXTENSIONS.forEach(function(ext) {
+        var cb = document.getElementById('ext-' + ext.id);
+        if (cb) { cb.checked = false; toggleExtension(ext.id); }
+        ext.items.forEach(function(ei) {
+          var ecb = document.getElementById('extitem-' + ei.id);
+          if (ecb) ecb.checked = false;
+        });
+      });
+      updateSectionProgress();
+      localStorage.removeItem(STORAGE_KEY);
+      showToast('All items reset');
+    });
+
+    /* ---------- Dashboard ---------- */
+    function getScoreData() {
+      var reported = 0, partial = 0, notReported = 0, na = 0, unassessed = 0;
+      CHECKLIST_ITEMS.forEach(function(item) {
+        var checked = document.querySelector('input[name="status-' + item.num + '"]:checked');
+        if (!checked) { unassessed++; return; }
+        switch (checked.value) {
+          case 'reported': reported++; break;
+          case 'partial': partial++; break;
+          case 'not-reported': notReported++; break;
+          case 'na': na++; break;
+        }
+      });
+      var total = 27;
+      var compliance = total > 0 ? Math.round((reported + na) / total * 100) : 0;
+      return {
+        reported: reported,
+        partial: partial,
+        notReported: notReported,
+        na: na,
+        unassessed: unassessed,
+        total: total,
+        compliance: compliance
+      };
+    }
+
+    function getSectionScores() {
+      return SECTIONS.map(function(section) {
+        var total = section.items.length;
+        var reported = 0;
+        section.items.forEach(function(num) {
+          var checked = document.querySelector('input[name="status-' + num + '"]:checked');
+          if (checked && (checked.value === 'reported' || checked.value === 'na')) {
+            reported++;
+          }
+        });
+        return { name: section.name, reported: reported, total: total, pct: total > 0 ? Math.round(reported / total * 100) : 0 };
+      });
+    }
+
+    function getAttentionItems() {
+      var items = [];
+      CHECKLIST_ITEMS.forEach(function(item) {
+        var checked = document.querySelector('input[name="status-' + item.num + '"]:checked');
+        if (checked && (checked.value === 'partial' || checked.value === 'not-reported')) {
+          items.push({
+            num: item.num,
+            title: item.title,
+            status: checked.value
+          });
+        }
+      });
+      return items;
+    }
+
+    function scoreColor(pct) {
+      if (pct >= 80) return 'var(--status-reported)';
+      if (pct >= 50) return 'var(--status-partial)';
+      return 'var(--status-not-reported)';
+    }
+
+    function renderDashboard() {
+      var container = document.getElementById('dashboardContainer');
+      var score = getScoreData();
+      var sectionScores = getSectionScores();
+      var attention = getAttentionItems();
+      var circumference = 2 * Math.PI * 65;
+      var offset = circumference - (score.compliance / 100) * circumference;
+
+      var html = '<div class="dashboard-grid">';
+
+      // Compliance Score Ring
+      html += '<div class="dash-card" style="text-align:center">' +
+        '<div class="dash-card-title">Overall Compliance</div>' +
+        '<div class="score-ring">' +
+          '<svg viewBox="0 0 150 150">' +
+            '<circle class="score-ring-bg" cx="75" cy="75" r="65"></circle>' +
+            '<circle class="score-ring-fg" cx="75" cy="75" r="65" ' +
+              'stroke="' + scoreColor(score.compliance) + '" ' +
+              'stroke-dasharray="' + circumference + '" ' +
+              'stroke-dashoffset="' + offset + '"></circle>' +
+          '</svg>' +
+          '<div class="score-ring-text">' +
+            '<div class="score-value" style="color:' + scoreColor(score.compliance) + '">' + score.compliance + '%</div>' +
+            '<div class="score-label">Compliance</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+      // Status Breakdown
+      html += '<div class="dash-card">' +
+        '<div class="dash-card-title">Status Breakdown</div>' +
+        '<div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--status-reported)"></span> Reported</span><span class="stat-value">' + score.reported + '</span></div>' +
+        '<div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--status-partial)"></span> Partially</span><span class="stat-value">' + score.partial + '</span></div>' +
+        '<div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--status-not-reported)"></span> Not Reported</span><span class="stat-value">' + score.notReported + '</span></div>' +
+        '<div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--status-na)"></span> N/A</span><span class="stat-value">' + score.na + '</span></div>' +
+        '<div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--text-muted)"></span> Unassessed</span><span class="stat-value">' + score.unassessed + '</span></div>' +
+      '</div>';
+
+      html += '</div>';
+
+      // Section Progress Bars
+      html += '<div class="dash-card" style="margin-bottom:var(--space-6)">' +
+        '<div class="dash-card-title">Section-by-Section Progress</div>';
+      sectionScores.forEach(function(s) {
+        html += '<div class="section-bar-wrap">' +
+          '<div class="section-bar-label"><span>' + escapeHtml(s.name) + '</span><span>' + s.reported + '/' + s.total + ' (' + s.pct + '%)</span></div>' +
+          '<div class="section-bar-track"><div class="section-bar-fill" style="width:' + s.pct + '%;background:' + scoreColor(s.pct) + '"></div></div>' +
+        '</div>';
+      });
+      html += '</div>';
+
+      // Attention Items
+      html += '<div class="dash-card" style="margin-bottom:var(--space-6)">' +
+        '<div class="dash-card-title">Items Needing Attention (' + attention.length + ')</div>';
+      if (attention.length === 0) {
+        html += '<p style="color:var(--text-secondary);font-size:0.9rem;">No items currently need attention. Mark items as "Partially" or "Not reported" to see them here.</p>';
+      } else {
+        html += '<ul class="attention-list">';
+        attention.forEach(function(a) {
+          var badgeClass = a.status === 'partial' ? 'partial' : 'not-reported';
+          var badgeText = a.status === 'partial' ? 'Partial' : 'Not Reported';
+          html += '<li class="attention-item">' +
+            '<span class="attention-badge ' + badgeClass + '">' + badgeText + '</span>' +
+            '<span>Item ' + a.num + ': ' + escapeHtml(a.title) + '</span>' +
+          '</li>';
+        });
+        html += '</ul>';
+      }
+      html += '</div>';
+
+      // Compliance Statement
+      html += '<div class="dash-card">' +
+        '<div class="dash-card-title">Auto-Generated Compliance Statement</div>' +
+        '<div class="compliance-statement" id="complianceStatement">' + escapeHtml(generateComplianceStatement(score, attention)) + '</div>' +
+        '<div style="margin-top:var(--space-3);text-align:right">' +
+          '<button class="btn btn-secondary" id="btnCopyStatement" type="button">Copy Statement</button>' +
+        '</div>' +
+      '</div>';
+
+      container.innerHTML = html;
+
+      // Copy statement handler
+      var copyBtn = document.getElementById('btnCopyStatement');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+          var text = generateComplianceStatement(score, attention);
+          navigator.clipboard.writeText(text).then(function() {
+            showToast('Statement copied to clipboard');
+          }).catch(function() {
+            showToast('Failed to copy', true);
+          });
+        });
+      }
+    }
+
+    function generateComplianceStatement(score, attention) {
+      var lines = [];
+      lines.push('PRISMA 2020 Compliance Statement');
+      lines.push('');
+      lines.push('This systematic review was assessed against the PRISMA 2020 checklist (Page et al. BMJ 2021;372:n71).');
+      lines.push('');
+      lines.push('Overall compliance: ' + score.compliance + '% (' + score.reported + ' reported, ' + score.na + ' not applicable, out of ' + score.total + ' items).');
+      if (score.partial > 0) {
+        lines.push(score.partial + ' item(s) were partially reported.');
+      }
+      if (score.notReported > 0) {
+        lines.push(score.notReported + ' item(s) were not reported.');
+      }
+      if (attention.length > 0) {
+        lines.push('');
+        lines.push('Items requiring attention:');
+        attention.forEach(function(a) {
+          var statusText = a.status === 'partial' ? 'partially reported' : 'not reported';
+          lines.push('  - Item ' + a.num + ' (' + a.title + '): ' + statusText);
+        });
+      }
+      if (score.unassessed > 0) {
+        lines.push('');
+        lines.push('Note: ' + score.unassessed + ' item(s) have not yet been assessed.');
+      }
+      lines.push('');
+      lines.push('Generated by PRISMA 2020 Compliance Checker on ' + new Date().toLocaleDateString() + '.');
+      return lines.join('\n');
+    }
+
+    /* ---------- Extensions Tab ---------- */
+    function renderExtensions() {
+      var container = document.getElementById('extensionsContainer');
+      var html = '<p style="color:var(--text-secondary);margin-bottom:var(--space-5);font-size:0.92rem;">' +
+        'Check any PRISMA extensions applicable to your review. Additional checklist items will appear when an extension is enabled.</p>';
+      EXTENSIONS.forEach(function(ext) {
+        html += '<div class="extension-card" id="ext-card-' + ext.id + '">' +
+          '<div class="extension-header">' +
+            '<input type="checkbox" class="extension-check" id="ext-' + ext.id + '" aria-label="Enable ' + escapeHtml(ext.name) + '">' +
+            '<div>' +
+              '<div class="extension-title">' + escapeHtml(ext.name) + ' &mdash; ' + escapeHtml(ext.fullName) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="extension-desc">' + escapeHtml(ext.description) + '</div>' +
+          '<div class="extension-items" id="ext-items-' + ext.id + '">';
+        ext.items.forEach(function(ei) {
+          html += '<div class="ext-item">' +
+            '<input type="checkbox" class="ext-item-check" id="extitem-' + ei.id + '" aria-label="' + escapeHtml(ei.label) + '">' +
+            '<label class="ext-item-label" for="extitem-' + ei.id + '">' + escapeHtml(ei.label) + '</label>' +
+          '</div>';
+        });
+        html += '</div></div>';
+      });
+      container.innerHTML = html;
+
+      // Bind
+      EXTENSIONS.forEach(function(ext) {
+        var cb = document.getElementById('ext-' + ext.id);
+        cb.addEventListener('change', function() {
+          toggleExtension(ext.id);
+          saveState();
+        });
+      });
+      container.addEventListener('change', function(e) {
+        if (e.target.classList.contains('ext-item-check')) {
+          saveState();
+        }
+      });
+    }
+
+    function toggleExtension(extId) {
+      var cb = document.getElementById('ext-' + extId);
+      var card = document.getElementById('ext-card-' + extId);
+      if (cb.checked) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    }
+
+    /* ---------- Export Tab ---------- */
+    function renderExport() {
+      var container = document.getElementById('exportContainer');
+      var html = '<div class="export-grid">' +
+        '<div class="export-card" id="exportCSV" tabindex="0" role="button" aria-label="Export as CSV">' +
+          '<div class="export-icon">&#128196;</div>' +
+          '<div class="export-card-title">Export CSV</div>' +
+          '<div class="export-card-desc">Download checklist data as a CSV spreadsheet</div>' +
+        '</div>' +
+        '<div class="export-card" id="exportJSON" tabindex="0" role="button" aria-label="Export as JSON">' +
+          '<div class="export-icon">&#123;&#125;</div>' +
+          '<div class="export-card-title">Export JSON</div>' +
+          '<div class="export-card-desc">Download structured data in JSON format</div>' +
+        '</div>' +
+        '<div class="export-card" id="exportClipboard" tabindex="0" role="button" aria-label="Copy formatted checklist">' +
+          '<div class="export-icon">&#128203;</div>' +
+          '<div class="export-card-title">Copy to Clipboard</div>' +
+          '<div class="export-card-desc">Copy a formatted text checklist</div>' +
+        '</div>' +
+        '<div class="export-card" id="exportPrint" tabindex="0" role="button" aria-label="Print summary">' +
+          '<div class="export-icon">&#128424;</div>' +
+          '<div class="export-card-title">Print Summary</div>' +
+          '<div class="export-card-desc">Print-ready compliance summary</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="export-preview">' +
+        '<div class="export-preview-title">Preview</div>' +
+        '<div class="export-preview-content" id="exportPreviewContent">Select an export format above to preview the output.</div>' +
+      '</div>';
+      container.innerHTML = html;
+
+      // Bind export buttons
+      document.getElementById('exportCSV').addEventListener('click', doExportCSV);
+      document.getElementById('exportCSV').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doExportCSV(); } });
+      document.getElementById('exportJSON').addEventListener('click', doExportJSON);
+      document.getElementById('exportJSON').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doExportJSON(); } });
+      document.getElementById('exportClipboard').addEventListener('click', doExportClipboard);
+      document.getElementById('exportClipboard').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doExportClipboard(); } });
+      document.getElementById('exportPrint').addEventListener('click', doExportPrint);
+      document.getElementById('exportPrint').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doExportPrint(); } });
+    }
+
+    function renderExportPreview() {
+      // do nothing on tab switch - preview updates on button click
+    }
+
+    function getExportData() {
+      var rows = [];
+      CHECKLIST_ITEMS.forEach(function(item) {
+        var checked = document.querySelector('input[name="status-' + item.num + '"]:checked');
+        var pageEl = document.getElementById('page-' + item.num);
+        var notesEl = document.getElementById('notes-' + item.num);
+        var sectionName = '';
+        SECTIONS.forEach(function(s) {
+          if (s.items.indexOf(item.num) >= 0) sectionName = s.name;
+        });
+        rows.push({
+          item: item.num,
+          section: sectionName,
+          title: item.title,
+          description: item.description,
+          status: checked ? checked.value : 'unassessed',
+          page: pageEl ? pageEl.value : '',
+          notes: notesEl ? notesEl.value : ''
+        });
+      });
+      return rows;
+    }
+
+    function getExtensionExportData() {
+      var extData = [];
+      EXTENSIONS.forEach(function(ext) {
+        var cb = document.getElementById('ext-' + ext.id);
+        if (cb && cb.checked) {
+          var items = [];
+          ext.items.forEach(function(ei) {
+            var ecb = document.getElementById('extitem-' + ei.id);
+            items.push({
+              id: ei.id,
+              label: ei.label,
+              checked: ecb ? ecb.checked : false
+            });
+          });
+          extData.push({
+            id: ext.id,
+            name: ext.name,
+            fullName: ext.fullName,
+            items: items
+          });
+        }
+      });
+      return extData;
+    }
+
+    function doExportCSV() {
+      var rows = getExportData();
+      var lines = ['Item,Section,Title,Status,Page/Section,Notes'];
+      rows.forEach(function(r) {
+        var vals = [
+          r.item,
+          '"' + sanitizeCSV(r.section) + '"',
+          '"' + sanitizeCSV(r.title) + '"',
+          '"' + sanitizeCSV(r.status) + '"',
+          '"' + sanitizeCSV(r.page) + '"',
+          '"' + sanitizeCSV(r.notes).replace(/"/g, '""') + '"'
+        ];
+        lines.push(vals.join(','));
+      });
+      var csv = lines.join('\n');
+      var preview = document.getElementById('exportPreviewContent');
+      preview.textContent = csv;
+
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'prisma-2020-checklist.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('CSV downloaded');
+    }
+
+    function doExportJSON() {
+      var data = {
+        prisma2020: {
+          generatedAt: new Date().toISOString(),
+          compliance: getScoreData(),
+          items: getExportData(),
+          extensions: getExtensionExportData()
+        }
+      };
+      var json = JSON.stringify(data, null, 2);
+      var preview = document.getElementById('exportPreviewContent');
+      preview.textContent = json;
+
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'prisma-2020-checklist.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('JSON downloaded');
+    }
+
+    function doExportClipboard() {
+      var rows = getExportData();
+      var score = getScoreData();
+      var lines = [];
+      lines.push('PRISMA 2020 CHECKLIST');
+      lines.push('====================');
+      lines.push('Compliance: ' + score.compliance + '% (' + score.reported + ' reported, ' + score.na + ' N/A, ' + score.partial + ' partial, ' + score.notReported + ' not reported, ' + score.unassessed + ' unassessed)');
+      lines.push('');
+      var currentSection = '';
+      rows.forEach(function(r) {
+        if (r.section !== currentSection) {
+          currentSection = r.section;
+          lines.push('--- ' + currentSection + ' ---');
+        }
+        var statusIcon = '';
+        switch (r.status) {
+          case 'reported': statusIcon = '[YES]'; break;
+          case 'partial': statusIcon = '[PARTIAL]'; break;
+          case 'not-reported': statusIcon = '[NO]'; break;
+          case 'na': statusIcon = '[N/A]'; break;
+          default: statusIcon = '[ ]';
+        }
+        var line = statusIcon + ' Item ' + r.item + ': ' + r.title;
+        if (r.page) line += ' (p. ' + r.page + ')';
+        if (r.notes) line += ' -- ' + r.notes;
+        lines.push(line);
+      });
+      lines.push('');
+      lines.push('Generated by PRISMA 2020 Compliance Checker on ' + new Date().toLocaleDateString());
+
+      var text = lines.join('\n');
+      var preview = document.getElementById('exportPreviewContent');
+      preview.textContent = text;
+
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('Copied to clipboard');
+      }).catch(function() {
+        showToast('Copy failed - use Ctrl+C from preview', true);
+      });
+    }
+
+    function doExportPrint() {
+      window.print();
+    }
+
+    /* ---------- Init ---------- */
+    renderChecklist();
+    renderExtensions();
+    renderExport();
+    renderDashboard();
+
+    var saved = loadState();
+    if (saved) {
+      restoreState(saved);
+      updateSectionProgress();
+      renderDashboard();
+    }
+
+  })();
+  </script>
+</body>
+</html>
