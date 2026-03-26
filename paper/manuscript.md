@@ -1,12 +1,11 @@
 # PRISMA 2020 Compliance Checker: An Interactive Web-Based Tool for Assessing Systematic Review Reporting
 
-[AUTHOR_PLACEHOLDER]^1, [AUTHOR_PLACEHOLDER]^2, [AUTHOR_PLACEHOLDER]^3
+Mahmood Ahmad^1^
 
-^1 [AFFILIATION_PLACEHOLDER]
-^2 [AFFILIATION_PLACEHOLDER]
-^3 [AFFILIATION_PLACEHOLDER]
+^1^ Royal Free Hospital, London, United Kingdom
 
-**Corresponding author:** [AUTHOR_PLACEHOLDER], [EMAIL_PLACEHOLDER]
+**Corresponding author:** Mahmood Ahmad, mahmood.ahmad2@nhs.net
+ORCID: 0009-0003-7781-4478
 
 **Word count:** ~2,500
 
@@ -140,8 +139,8 @@ The PRISMA 2020 Compliance Checker is an open-access, self-contained web applica
 - **Operating system(s):** Platform independent (browser-based)
 - **Programming language:** HTML5, CSS3, JavaScript (ES5+)
 - **Other requirements:** Any modern web browser (Chrome, Firefox, Safari, Edge)
-- **License:** [LICENSE_PLACEHOLDER]
-- **Source code:** [URL_PLACEHOLDER]
+- **License:** MIT
+- **Source code:** https://github.com/mahmood726-cyber/prisma-checker
 
 ## Abbreviations
 
@@ -153,15 +152,15 @@ EQUATOR, Enhancing the QUAlity and Transparency Of health Research; GRADE, Gradi
 
 **Consent for publication:** Not applicable.
 
-**Availability of data and materials:** The PRISMA 2020 Compliance Checker is a single HTML file available at [URL_PLACEHOLDER]. No external data are required.
+**Availability of data and materials:** The PRISMA 2020 Compliance Checker is a single HTML file available at https://github.com/mahmood726-cyber/prisma-checker. No external data are required.
 
-**Competing interests:** [COMPETING_INTERESTS_PLACEHOLDER]
+**Competing interests:** The author declares no competing interests.
 
-**Funding:** [FUNDING_PLACEHOLDER]
+**Funding:** No external funding.
 
-**Authors' contributions:** [CONTRIBUTIONS_PLACEHOLDER]
+**Authors' contributions:** MA conceived, designed, implemented, tested, and wrote the manuscript.
 
-**Acknowledgements:** [ACKNOWLEDGEMENTS_PLACEHOLDER]
+**Acknowledgements:** None.
 
 ## References
 
