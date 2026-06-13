@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PRISMA 2020 Compliance Checker</title>
   <meta name="description" content="PRISMA 2020 Checklist Compliance Checker — assess systematic review reporting against the 27-item PRISMA 2020 statement.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ===== CSS Variables ===== */
     :root {
@@ -1373,7 +1370,10 @@
         }
       });
       var total = 27;
-      var compliance = total > 0 ? Math.round((reported + na) / total * 100) : 0;
+      // Compliance = % of APPLICABLE items reported; N/A items are excluded
+      // from the denominator (not counted as compliant). See README "Methods".
+      var applicable = total - na;
+      var compliance = applicable > 0 ? Math.round(reported / applicable * 100) : 0;
       return {
         reported: reported,
         partial: partial,
@@ -1389,13 +1389,17 @@
       return SECTIONS.map(function(section) {
         var total = section.items.length;
         var reported = 0;
+        var na = 0;
         section.items.forEach(function(num) {
           var checked = document.querySelector('input[name="status-' + num + '"]:checked');
-          if (checked && (checked.value === 'reported' || checked.value === 'na')) {
-            reported++;
-          }
+          if (!checked) { return; }
+          if (checked.value === 'reported') { reported++; }
+          else if (checked.value === 'na') { na++; }
         });
-        return { name: section.name, reported: reported, total: total, pct: total > 0 ? Math.round(reported / total * 100) : 0 };
+        // N/A items excluded from the section denominator (same logic as the
+        // overall compliance score).
+        var applicable = total - na;
+        return { name: section.name, reported: reported, total: total, pct: applicable > 0 ? Math.round(reported / applicable * 100) : 0 };
       });
     }
 

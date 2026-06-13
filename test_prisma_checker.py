@@ -4,7 +4,8 @@ PRISMA 2020 Compliance Checker — Selenium Test Suite
 Run: python test_prisma_checker.py
 """
 import sys, os, time, io, unittest
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if "pytest" not in sys.modules:
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By

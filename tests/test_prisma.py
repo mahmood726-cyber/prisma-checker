@@ -10,7 +10,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-HTML = 'file:///' + os.path.abspath(r'C:\Models\PRISMAChecker\prisma-checker.html').replace('\\', '/')
+HTML = 'file:///' + os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'prisma-checker.html').replace('\\', '/')
 
 
 class TestPRISMAChecker(unittest.TestCase):
